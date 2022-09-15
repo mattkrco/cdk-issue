@@ -5,6 +5,7 @@ from aws_cdk import aws_lambda as _lambda
 from aws_cdk import aws_dynamodb as _dynamodb
 from aws_cdk import aws_s3 as s3
 from aws_cdk import aws_events as events
+from aws_cdk import aws_iam as iam
 from constructs import Construct
 
 
@@ -51,6 +52,20 @@ class CdkAppStack(Stack):
                                                 identity_source=_apigw.IdentitySource.header('auth-header'))
 
         authorizer_id = auth.attr_authorizer_id
+
+        auth_lambda.grant_invoke(iam.ServicePrincipal("apigateway.amazonaws.com"))
+
+        auth_ifunction = _lambda.Function.from_function_arn(self,
+                                                            "authIFunction",
+                                                            auth_lambda.function_arn
+                                                            )
+
+        auth2 = _apigw.RequestAuthorizer(self, 
+                                        "sampleAuthorizer2",
+                                        identity_sources=[_apigw.IdentitySource.header('auth-header')],
+                                        handler=auth_ifunction,
+                                        results_cache_ttl=aws_cdk.Duration.seconds(1)
+                                        )
         
         res = api.root.add_resource("sample-resource")
 
@@ -67,11 +82,12 @@ class CdkAppStack(Stack):
             ],
         )
 
-        res.add_method(
+        method = res.add_method(
             "POST",
             lambda_integration,
-            authorization_type=_apigw.AuthorizationType.CUSTOM,
-            authorizer=authorizer_id,
+            #authorization_type=_apigw.AuthorizationType.CUSTOM,
+            #authorizer=auth,
+            authorizer=auth2,
             method_responses=[
                 {
                     "statusCode": "200",
@@ -81,3 +97,8 @@ class CdkAppStack(Stack):
                 }
             ]
         )
+
+        # method_resource = method.node.find_child('Resource')
+        # method_resource.add_property_override('AuthorizationType', 'CUSTOM')
+        # method_resource.add_property_override('AuthorizerId', {
+        #     "Ref": authorizer_id})

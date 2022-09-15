@@ -12,7 +12,7 @@ import os
 
 
 
-def lambda_handler(event, context):
+def handler(event, context):
     """Do not print the auth token unless absolutely necessary """
     #print("Client token: " + event['authorizationToken'])
     print("Method ARN: " + event['methodArn'])
@@ -23,11 +23,15 @@ def lambda_handler(event, context):
     """1. Call out to OAuth provider"""
     """2. Decode a JWT token inline"""
     """3. Lookup in a self-managed DB"""
+    print(event)
 
     try:
         sampleAuthHeader = event['headers']['auth-header']
     except:
+        print('auth-header not in event headers, this is unauthorized')
         raise Exception('Unauthorized')
+    
+    print('made it here, we are authorized')
 
     """you can send a 401 Unauthorized response to the client by failing like so:"""
     """raise Exception('Unauthorized')"""
