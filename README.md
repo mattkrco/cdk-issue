@@ -1,6 +1,6 @@
 # cdk-issue
 
-This is a simplified sample stack involving one dynamo table and one lambda function. In the real world, this stack involves dozens of tables and dozens of lambda functions.
+This is a simplified sample stack involving two dynamo tables and two lambda functions. In the real world, this stack involves dozens of tables and dozens of lambda functions.
 
 The goal is to separate the stack into two separate stacks - one for dynamo and one for lambda.
 

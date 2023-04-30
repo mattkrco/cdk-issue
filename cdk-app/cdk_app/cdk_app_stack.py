@@ -14,12 +14,22 @@ lambda_defs = [
         'tables_used': [
             'sampleTable'
         ]
+    },
+    {
+        'id': 'otherLambda',
+        'tables_used': [
+            'sampleTable','otherTable'
+        ]
     }
 ]
 
 table_defs = [
     {
         'id': 'sampleTable',
+        'partition_key': "PartitionKey"
+    },
+    {
+        'id': 'otherTable',
         'partition_key': "PartitionKey"
     }
 ]
@@ -55,7 +65,7 @@ class CdkAppStack(Stack):
                 id=lambda_def['id'],
                 runtime=_lambda.Runtime.PYTHON_3_9,
                 code=_lambda.Code.from_asset("lambda"),
-                handler="lambda.handler",
+                handler=f"{lambda_def['id']}.handler",
                 environment=lambda_env_data
             )
 
