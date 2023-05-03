@@ -8,20 +8,7 @@ from aws_cdk import aws_events as events
 from aws_cdk import aws_iam as iam
 from constructs import Construct
 
-lambda_defs = [
-    {
-        'id': 'sampleLambda',
-        'tables_used': [
-            'sampleTable'
-        ]
-    },
-    {
-        'id': 'otherLambda',
-        'tables_used': [
-            'sampleTable','otherTable'
-        ]
-    }
-]
+
 
 table_defs = [
     {
@@ -40,7 +27,7 @@ class CdkAppStack(Stack):
     def __init__(self, scope: Construct, construct_id: str, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
-        table_objects = {}
+        self.table_objects = {}
 
         for table_def in table_defs:
             sample_table = _dynamodb.Table(self,
@@ -53,22 +40,6 @@ class CdkAppStack(Stack):
                 removal_policy=aws_cdk.RemovalPolicy.DESTROY
             )
 
-            table_objects[table_def['id']] = sample_table
+            self.table_objects[table_def['id']] = sample_table
 
-        for lambda_def in lambda_defs:
-            lambda_env_data={}
-
-            for table_used in lambda_def['tables_used']:
-                lambda_env_data[f'TABLENAME{table_used.upper()}'] = table_objects[table_used].table_name
-
-            sample_lambda = _lambda.Function(self,
-                id=lambda_def['id'],
-                runtime=_lambda.Runtime.PYTHON_3_9,
-                code=_lambda.Code.from_asset("lambda"),
-                handler=f"{lambda_def['id']}.handler",
-                environment=lambda_env_data
-            )
-
-            for table_used in lambda_def['tables_used']:
-                table_objects[table_used].grant_read_write_data(sample_lambda)
 
