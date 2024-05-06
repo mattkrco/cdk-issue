@@ -10,16 +10,24 @@ from constructs import Construct
 
 
 
-table_defs = [
+old_table_defs = [
     {
-        'id': 'sampleTable',
+        'id': 'tableOne',
         'partition_key': "PartitionKey"
     },
     {
-        'id': 'otherTable',
+        'id': 'tableTwo',
         'partition_key': "PartitionKey"
     }
 ]
+
+new_table_defs = [
+    {
+        'id': 'tableOne',
+        'partition_key': "PartitionKey"
+    }
+]
+
 
 
 class CdkAppStack(Stack):
@@ -29,8 +37,9 @@ class CdkAppStack(Stack):
 
         self.table_objects = {}
 
-        for table_def in table_defs:
-            sample_table = _dynamodb.Table(self,
+        ### update old_table_defs and new_table_defs here:
+        for table_def in new_table_defs:
+            table_object = _dynamodb.Table(self,
                 id=table_def['id'],
                 partition_key=_dynamodb.Attribute(
                     name=table_def['partition_key'],
@@ -40,6 +49,6 @@ class CdkAppStack(Stack):
                 removal_policy=aws_cdk.RemovalPolicy.DESTROY
             )
 
-            self.table_objects[table_def['id']] = sample_table
+            self.table_objects[table_def['id']] = table_object
 
 

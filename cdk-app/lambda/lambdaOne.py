@@ -6,7 +6,7 @@ from boto3.dynamodb.conditions import Key
 dynamodb = boto3.resource('dynamodb')
 
 def handler(event, context):
-    table_name = os.environ[f'TABLENAMESAMPLETABLE']
+    table_name = os.environ[f'TABLENAMETABLEONE']
     table_resource = dynamodb.Table(table_name)
 
     query_response = table_resource.query(

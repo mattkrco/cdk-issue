@@ -2,17 +2,32 @@ import aws_cdk
 from aws_cdk import Stack, aws_lambda as _lambda
 from constructs import Construct
 
-lambda_defs = [
+old_lambda_defs = [
     {
-        'id': 'sampleLambda',
+        'id': 'lambdaOne',
         'tables_used': [
-            'sampleTable'
+            'tableOne'
         ]
     },
     {
-        'id': 'otherLambda',
+        'id': 'lambdaTwo',
         'tables_used': [
-            'sampleTable','otherTable'
+            'tableOne','tableTwo'
+        ]
+    }
+]
+
+new_lambda_defs = [
+    {
+        'id': 'lambdaOne',
+        'tables_used': [
+            'tableOne'
+        ]
+    },
+    {
+        'id': 'lambdaTwo',
+        'tables_used': [
+            'tableOne'
         ]
     }
 ]
@@ -21,7 +36,8 @@ class LambdaStack(Stack):
     def __init__(self, scope: Construct, construct_id: str, tables, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
-        for lambda_def in lambda_defs:
+        ### update old_lambda_defs and new_lambda_defs here:
+        for lambda_def in new_lambda_defs:
             lambda_env_data={}
 
             for table_used in lambda_def['tables_used']:
