@@ -9,22 +9,17 @@ from aws_cdk import aws_iam as iam
 from constructs import Construct
 
 
-
-old_table_defs = [
+table_defs = [
     {
         'id': 'tableOne',
-        'partition_key': "PartitionKey"
+        'partition_key': "PartitionKey",
+        'sort_key': "SortKey",
+        'add_index': False
     },
     {
         'id': 'tableTwo',
-        'partition_key': "PartitionKey"
-    }
-]
-
-new_table_defs = [
-    {
-        'id': 'tableOne',
-        'partition_key': "PartitionKey"
+        'partition_key': "PartitionKey",
+        'sort_key': "SortKey"
     }
 ]
 
@@ -38,17 +33,30 @@ class CdkAppStack(Stack):
         self.table_objects = {}
 
         ### update old_table_defs and new_table_defs here:
-        for table_def in new_table_defs:
+        for table_def in table_defs:
             table_object = _dynamodb.Table(self,
                 id=table_def['id'],
                 partition_key=_dynamodb.Attribute(
                     name=table_def['partition_key'],
                     type=_dynamodb.AttributeType.STRING
                 ),
+                sort_key=_dynamodb.Attribute(
+                    name=table_def['sort_key'],
+                    type=_dynamodb.AttributeType.STRING
+                ),
                 billing_mode=_dynamodb.BillingMode.PAY_PER_REQUEST,
                 removal_policy=aws_cdk.RemovalPolicy.DESTROY
             )
 
-            self.table_objects[table_def['id']] = table_object
+            if table_def.get('add_index', False):
+                table_object.add_local_secondary_index(
+                    index_name='sample-index',
+                    sort_key =_dynamodb.Attribute(
+                        name='IndexKey',
+                        type=_dynamodb.AttributeType.STRING
+                    ),
+                    projection_type=_dynamodb.ProjectionType.ALL
+                )
 
+            self.table_objects[table_def['id']] = table_object
 

@@ -6,7 +6,7 @@ from cdk_app.cdk_app_stack import CdkAppStack
 from cdk_app.lambda_stack import LambdaStack
 
 app = cdk.App()
-cdk_app_stack = CdkAppStack(app, "cdk-app")
+cdk_app_stack = CdkAppStack(app, "cdk-app-stack")
 LambdaStack(app, 'lambda-stack', cdk_app_stack.table_objects)
 
 app.synth()
